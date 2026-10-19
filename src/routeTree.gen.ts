@@ -11,6 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiHealthRouteImport } from './routes/api.health'
+import { Route as ApiQuestionsRouteImport } from './routes/api.questions'
+import { Route as QuestionsIndexRouteImport } from './routes/questions.index'
+import { Route as QuestionsQuestionFrontendIdRouteImport } from './routes/questions.$questionFrontendId'
+import { Route as ApiQuestionsQuestionFrontendIdRouteImport } from './routes/api.questions.$questionFrontendId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +26,87 @@ const ApiHealthRoute = ApiHealthRouteImport.update({
   path: '/api/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiQuestionsRoute = ApiQuestionsRouteImport.update({
+  id: '/api/questions',
+  path: '/api/questions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuestionsIndexRoute = QuestionsIndexRouteImport.update({
+  id: '/questions/',
+  path: '/questions/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuestionsQuestionFrontendIdRoute =
+  QuestionsQuestionFrontendIdRouteImport.update({
+    id: '/questions/$questionFrontendId',
+    path: '/questions/$questionFrontendId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiQuestionsQuestionFrontendIdRoute =
+  ApiQuestionsQuestionFrontendIdRouteImport.update({
+    id: '/$questionFrontendId',
+    path: '/$questionFrontendId',
+    getParentRoute: () => ApiQuestionsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/health': typeof ApiHealthRoute
+  '/api/questions': typeof ApiQuestionsRouteWithChildren
+  '/questions/$questionFrontendId': typeof QuestionsQuestionFrontendIdRoute
+  '/questions/': typeof QuestionsIndexRoute
+  '/api/questions/$questionFrontendId': typeof ApiQuestionsQuestionFrontendIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/health': typeof ApiHealthRoute
+  '/api/questions': typeof ApiQuestionsRouteWithChildren
+  '/questions/$questionFrontendId': typeof QuestionsQuestionFrontendIdRoute
+  '/questions': typeof QuestionsIndexRoute
+  '/api/questions/$questionFrontendId': typeof ApiQuestionsQuestionFrontendIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api/health': typeof ApiHealthRoute
+  '/api/questions': typeof ApiQuestionsRouteWithChildren
+  '/questions/$questionFrontendId': typeof QuestionsQuestionFrontendIdRoute
+  '/questions/': typeof QuestionsIndexRoute
+  '/api/questions/$questionFrontendId': typeof ApiQuestionsQuestionFrontendIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/health'
+  fullPaths:
+    | '/'
+    | '/api/health'
+    | '/api/questions'
+    | '/questions/$questionFrontendId'
+    | '/questions/'
+    | '/api/questions/$questionFrontendId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/health'
-  id: '__root__' | '/' | '/api/health'
+  to:
+    | '/'
+    | '/api/health'
+    | '/api/questions'
+    | '/questions/$questionFrontendId'
+    | '/questions'
+    | '/api/questions/$questionFrontendId'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/health'
+    | '/api/questions'
+    | '/questions/$questionFrontendId'
+    | '/questions/'
+    | '/api/questions/$questionFrontendId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiHealthRoute: typeof ApiHealthRoute
+  ApiQuestionsRoute: typeof ApiQuestionsRouteWithChildren
+  QuestionsQuestionFrontendIdRoute: typeof QuestionsQuestionFrontendIdRoute
+  QuestionsIndexRoute: typeof QuestionsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +125,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/questions': {
+      id: '/api/questions'
+      path: '/api/questions'
+      fullPath: '/api/questions'
+      preLoaderRoute: typeof ApiQuestionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/questions/': {
+      id: '/questions/'
+      path: '/questions'
+      fullPath: '/questions/'
+      preLoaderRoute: typeof QuestionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/questions/$questionFrontendId': {
+      id: '/questions/$questionFrontendId'
+      path: '/questions/$questionFrontendId'
+      fullPath: '/questions/$questionFrontendId'
+      preLoaderRoute: typeof QuestionsQuestionFrontendIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/questions/$questionFrontendId': {
+      id: '/api/questions/$questionFrontendId'
+      path: '/$questionFrontendId'
+      fullPath: '/api/questions/$questionFrontendId'
+      preLoaderRoute: typeof ApiQuestionsQuestionFrontendIdRouteImport
+      parentRoute: typeof ApiQuestionsRoute
+    }
   }
 }
+
+interface ApiQuestionsRouteChildren {
+  ApiQuestionsQuestionFrontendIdRoute: typeof ApiQuestionsQuestionFrontendIdRoute
+}
+
+const ApiQuestionsRouteChildren: ApiQuestionsRouteChildren = {
+  ApiQuestionsQuestionFrontendIdRoute: ApiQuestionsQuestionFrontendIdRoute,
+}
+
+const ApiQuestionsRouteWithChildren = ApiQuestionsRoute._addFileChildren(
+  ApiQuestionsRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiHealthRoute: ApiHealthRoute,
+  ApiQuestionsRoute: ApiQuestionsRouteWithChildren,
+  QuestionsQuestionFrontendIdRoute: QuestionsQuestionFrontendIdRoute,
+  QuestionsIndexRoute: QuestionsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
